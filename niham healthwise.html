@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>NIHAM HealthWise — Final</title>
+<style>
+:root{
+  --bg:#041018; --muted:#9fb2bf;
+  --accent:#00fff2; --accent2:#00ff88; --btn:#00f6c1;
+  --card:#071425;
+  --glass:rgba(255,255,255,0.03);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,Segoe UI,Roboto,Arial;background:
+radial-gradient(900px 400px at 10% 10%, rgba(0,255,200,0.02), transparent),
+var(--bg); color:#e8f1f8; min-height:100vh}
+.header{padding:26px 20px;text-align:center}
+.header h1{color:var(--accent);font-size:30px;text-shadow:0 0 12px rgba(0,255,200,0.06)}
+.nav{display:flex;gap:18px;justify-content:center;margin-bottom:14px}
+.nav button{background:transparent;border:1px solid rgba(255,255,255,0.02);color:var(--muted);padding:8px 14px;border-radius:10px;cursor:pointer}
+.nav button.active{background:rgba(255,255,255,0.02);color:#fff;box-shadow:0 8px 30px rgba(0,255,200,0.02)}
+.container{max-width:1100px;margin:0 auto;padding:12px}
+.page{display:none;opacity:0;transform:translateY(6px);transition:all .18s}
+.page.active{display:block;opacity:1;transform:none}
+
+/* Search row (matches the remedies style you showed) */
+.search-row{display:flex;gap:10px;align-items:center;justify-content:center;margin:18px 0}
+.search-row input[type="text"]{
+  width:62%; padding:12px 14px; border-radius:12px; border:none;
+  background:#eef6fb; color:#012; font-size:15px; outline:none;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,0.06);
+}
+.search-row button{
+  background:var(--btn); border:none; padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700;
+  box-shadow:0 8px 30px rgba(0,255,200,0.05);
+}
+
+/* Cards */
+.card-list{display:flex;flex-direction:column;gap:16px;padding:6px 20px 40px}
+.disease-card, .remedy-card{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border-radius:12px; padding:18px; border:1px solid rgba(0,255,200,0.06)}
+.disease-card h3, .remedy-card h3{color:var(--accent); margin-bottom:8px}
+.disease-card p{color:var(--muted); margin:6px 0; line-height:1.4}
+.small-actions{margin-top:10px;display:flex;gap:10px}
+.small-actions button{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--muted)}
+.small-actions button.primary{background:var(--btn); color:#001; border:none}
+
+/* Chat area */
+.chat-wrapper{max-width:900px;margin:0 auto}
+#chatArea{background:#0b1016;border-radius:12px;padding:16px;height:360px;overflow:auto;border:1px solid rgba(255,255,255,0.02)}
+.msg{margin:8px 0;padding:10px;border-radius:10px;max-width:86%}
+.user{background:rgba(0,255,200,0.05);color:#bff;align-self:flex-end}
+.bot{background:rgba(255,255,255,0.02);color:var(--muted);align-self:flex-start}
+
+/* footer */
+.footer{text-align:center;color:var(--muted);padding:20px;}
+
+/* small responsive */
+@media(max-width:820px){
+  .search-row input[type="text"]{width:78%}
+  .nav{flex-wrap:wrap}
+}/* ======== Animated Background ======== */
+.animated-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top, #01161f, #000810 80%);
+  overflow: hidden;
+  z-index: -2;
+}
+
+/* Floating glowing particles */
+.particles::before, .particles::after {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0,255,195,0.12) 1px, transparent 1px);
+  background-size: 80px 80px;
+  animation: moveDots 80s linear infinite;
+  opacity: 0.3;
+}
+
+@keyframes moveDots {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-80px, -80px); }
+}
+
+/* Floating DNA double helix animation */
+.dna-animation {
+  position: absolute;
+  width: 180px;
+  height: 400px;
+  left: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 20px,
+    rgba(0, 255, 195, 0.5) 22px
+  );
+  mask: radial-gradient(circle, transparent 15%, black 16%);
+  animation: floatDNA 8s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 10px #00ffc3);
+}
+
+@keyframes floatDNA {
+  from { transform: translateY(-50%) rotate(0deg); }
+  to { transform: translateY(-48%) rotate(360deg); }
+}
+
+/* Animated heartbeat line */
+.heartbeat {
+  position: absolute;
+  bottom: 15%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #00ffc3, #00aaff, #00ffc3);
+  background-size: 300% 100%;
+  animation: heartbeatPulse 2.5s linear infinite;
+  filter: drop-shadow(0 0 8px #00ffc3);
+}
+
+@keyframes heartbeatPulse {
+  0%, 100% { background-position: 0 0; height: 2px; opacity: 0.4; }
+  50% { background-position: 100% 0; height: 4px; opacity: 1; }
+}
+
+/* ======== Main Content ======== */
+.home-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding-top: 10%;
+}
+
+.hero-logo {
+  width: 150px;
+  margin-bottom: 20px;
+  animation: pulseGlow 2s infinite ease-in-out;
+  filter: drop-shadow(0 0 30px #00ffc3);
+}
+
+.hero-title {
+  font-size: 3em;
+  color: #00ffc3;
+  font-weight: bold;
+  text-shadow: 0 0 20px #00ffc3;
+}
+
+.hero-subtitle {
+  color: #b8ffff;
+  font-size: 1.2em;
+  margin-bottom: 25px;
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.glow-btn,
+.glow-btn-secondary {
+  padding: 12px 30px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1em;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.glow-btn {
+  background: #00ffc3;
+  color: #000;
+  box-shadow: 0 0 25px #00ffc3;
+}
+
+.glow-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 40px #00fff0;
+}
+
+.glow-btn-secondary {
+  background: transparent;
+  border: 2px solid #00ffc3;
+  color: #00ffc3;
+}
+
+.glow-btn-secondary:hover {
+  background: #00ffc3;
+  color: #000;
+}
+
+/* Glow animation for logo */
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px #00ffc3); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 35px #00ffc3); }
+}
+
+
+</style>
+</head>
+<body>
+  <header class="header"> 
+    <h1>NIHAM HealthWise</h1>
+    <div style="color:var(--muted)">Blending Nature, Health, and Innovation</div>
+  </header>
+
+  <nav class="nav" role="navigation" aria-label="Main">
+    <button data-page="home" class="active">Home</button>
+    <button data-page="explore">Explore Diseases</button>
+    <button data-page="remedies">Natural Remedies</button>
+    <button data-page="chatbot">Chatbot</button>
+    <button data-page="statistics">Statistics</button>
+    <button data-page="about">About</button>
+  </nav>
+
+  <main class="container">
+    <!-- ========================== -->
+<!-- 🌿 ENHANCED HOME SECTION -->
+<!-- ========================== -->
+<!-- ========================== -->
+<!-- ⚡ INTRO ANIMATION SCREEN -->
+<!-- ========================== -->
+<section id="intro" class="intro-page">
+  <div class="intro-screen">
+    <img src="NIHAM_Logo.png" alt="NIHAM Logo" class="intro-logo">
+    <h1 class="intro-title">NIHAM HealthWise</h1>
+    <p class="intro-tagline">Blending Nature, Health, and Innovation</p>
+  </div>
+</section>
+<style>
+  /* ======== INTRO PAGE ANIMATION ======== */
+.intro-page {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #00171f 0%, #000910 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  overflow: hidden;
+  animation: fadeOutIntro 4s ease 3.5s forwards;
+}
+
+.intro-screen {
+  text-align: center;
+  color: #00ffc3;
+  animation: fadeInIntro 1.5s ease forwards;
+}
+
+.intro-logo {
+  width: 150px;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 25px #00ffc3);
+  animation: pulseIntro 2s infinite ease-in-out;
+}
+
+.intro-title {
+  font-size: 2.5em;
+  color: #00ffc3;
+  text-shadow: 0 0 25px #00ffc3;
+  opacity: 0;
+  animation: fadeInUp 2s ease 0.5s forwards;
+}
+
+.intro-tagline {
+  color: #aaffff;
+  font-size: 1.1em;
+  letter-spacing: 1px;
+  margin-top: 10px;
+  opacity: 0;
+  animation: fadeInUp 2s ease 1.2s forwards;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeInIntro {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseIntro {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px #00ffc3); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 40px #00ffc3); }
+}
+
+@keyframes fadeOutIntro {
+  to { opacity: 0; visibility: hidden; }
+}
+
+</style>
+<section id="home" class="page">
+  <div class="animated-bg">
+    <!-- Floating glowing particles -->
+    <div class="particles"></div>
+
+    <!-- Floating DNA animation -->
+    <div class="dna-animation"></div>
+
+    <!-- Heartbeat line animation -->
+    <div class="heartbeat"></div>
+  </div>
+
+  <!-- Main content -->
+  <div class="home-content">
+    <img src="NIHAM_Logo.png" alt="NIHAM Logo" class="hero-logo">
+    <h1 class="hero-title">NIHAM HealthWise</h1>
+    <p class="hero-subtitle">Blending Nature, Health, and Innovation</p>
+
+    <div class="hero-buttons">
+      <button class="glow-btn" onclick="setActivePage('explore')">Explore Diseases</button>
+      <button class="glow-btn-secondary" onclick="setActivePage('chatbot')">Chat with AI</button>
+    </div>
+  </div>
+</section>
+
+    <!-- EXPLORE DISEASES (matching Remedies layout) -->
+    <section id="explore" class="page">
+      <h2 style="color:var(--accent)">Diseases Explorer</h2>
+
+      <div class="search-row" aria-label="Search disease">
+        <input id="diseaseSearch" type="text" placeholder="Search disease..." />
+        <button id="searchBtn">Search</button>
+        <button id="showAllBtn">Show All</button>
+      </div>
+
+      <div class="card-list" id="diseaseList">
+        <!-- We'll fill these programmatically on load for correctness -->
+      </div>
+    </section>
+
+    <!-- NATURAL REMEDIES (matching layout) -->
+    <section id="remedies" class="page">
+      <h2 style="color:var(--accent)">Natural & Home Remedies</h2>
+
+      <div class="search-row" aria-label="Search remedy">
+        <input id="remedySearch" type="text" placeholder="Search remedy..." />
+        <button id="remedySearchBtn">Search</button>
+        <button id="remedyShowAllBtn">Show All</button>
+      </div>
+
+      <div class="card-list" id="remedyList">
+        <!-- Programmatically filled -->
+      </div>
+    </section>
+
+    <!-- CHATBOT -->
+    <section id="chatbot" class="page">
+      <h2 style="color:var(--accent)">AI Health Chatbot</h2>
+      <div class="chat-wrapper">
+        <div id="chatArea" aria-live="polite" style="display:flex;flex-direction:column"></div>
+
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <input id="chatInput" placeholder="Ask about a disease, remedy, diet, or general question..." style="flex:1;padding:12px;border-radius:10px;border:none;background:#0e141b;color:#fff"/>
+          <button id="sendChatBtn" style="padding:10px 14px;border-radius:10px;border:none;background:var(--btn);cursor:pointer">Send</button>
+        </div>
+        <p style="color:var(--muted);margin-top:10px;font-size:13px">For emergencies, contact local medical services immediately. NIHAM is informational only.</p>
+      </div>
+    </section>
+
+      <!-- 📊 STATISTICS SECTION with charts -->
+<section id="statistics" class="page">
+  <h2 style="color:var(--accent);text-align:center;">Global Health Statistics</h2>
+  <p style="color:var(--muted);text-align:center;margin:10px auto;max-width:700px;">
+    Visual overview of disease prevalence, recovery rates, and health awareness trends.
+  </p>
+
+  <div class="charts-container">
+
+    <!-- 🔹 Bar Chart -->
+    <div class="chart-card">
+      <h3>Most Common Diseases (2025)</h3>
+      <div class="bar-chart">
+        <div class="bar-item"><span>Common Cold</span><div class="bar-fill" data-width="90"></div></div>
+        <div class="bar-item"><span>Fever</span><div class="bar-fill" data-width="85"></div></div>
+        <div class="bar-item"><span>Diabetes</span><div class="bar-fill" data-width="65"></div></div>
+        <div class="bar-item"><span>Hypertension</span><div class="bar-fill" data-width="70"></div></div>
+      </div>
+    </div>
+
+    <!-- 🔹 Pie Chart -->
+    <div class="chart-card">
+      <h3>Curable vs Chronic Conditions</h3>
+      <div class="pie-chart">
+        <div class="pie" id="pie"></div>
+        <div class="pie-labels">
+          <div><span class="dot" style="background:#00ffc3;"></span> Curable (85%)</div>
+          <div><span class="dot" style="background:#ff005c;"></span> Chronic (15%)</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 🔹 Counter -->
+  <div class="count-section">
+    <h3 style="color:var(--accent2);">Awareness Growth (2020–2025)</h3>
+    <div class="count-boxes">
+      <div class="count-box">
+        <h1 class="count" data-count="45">0</h1>
+        <p>2020</p>
+      </div>
+      <div class="count-box">
+        <h1 class="count" data-count="68">0</h1>
+        <p>2022</p>
+      </div>
+      <div class="count-box">
+        <h1 class="count" data-count="92">0</h1>
+        <p>2025</p>
+      </div>
+    </div>
+  </div>
+</section>
+<style>
+  .charts-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.chart-card {
+  background: #0b1016;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 10px;
+  width: 42%;
+  box-shadow: 0 0 10px #00ffee44;
+  color: #fff;
+}
+
+.bar-item {
+  margin: 12px 0;
+}
+
+.bar-item span {
+  display: inline-block;
+  width: 140px;
+  font-size: 15px;
+  color: #ccc;
+}
+
+.bar-fill {
+  display: inline-block;
+  height: 12px;
+  background: linear-gradient(90deg, #00ffc3, #008cff);
+  border-radius: 8px;
+  width: 0;
+  transition: width 1.5s ease;
+  box-shadow: 0 0 8px #00ffc355;
+}
+
+/* Pie Chart */
+.pie-chart {
+  text-align: center;
+  position: relative;
+}
+
+.pie {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: conic-gradient(#00ffc3 0% 85%, #ff005c 85% 100%);
+  margin: 15px auto;
+  box-shadow: 0 0 15px #00ffee66;
+}
+
+.pie-labels {
+  text-align: left;
+  margin-top: 10px;
+  margin-left: 40px;
+}
+
+.dot {
+  height: 10px;
+  width: 10px;
+  display: inline-block;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.count-section {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.count-boxes {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin-top: 20px;
+}
+
+.count-box h1 {
+  color: var(--accent);
+  font-size: 48px;
+}
+
+</style>
+
+    <!-- ========================== -->
+<!-- 🌿 ABOUT SECTION -->
+<!-- ========================== -->
+<section id="about" class="page">
+  <div class="about-container">
+    <h2>About NIHAM HealthWise</h2>
+    <p class="about-intro">
+      <strong>NIHAM HealthWise</strong> is a futuristic offline healthcare assistant that combines 
+      <span class="highlight">Nature</span>, <span class="highlight">Health</span>, and <span class="highlight">Innovation</span> 
+      to make health education and basic guidance available for everyone, anytime — even without the internet.
+    </p>
+
+    <h3>🌍 Why We Built NIHAM HealthWise</h3>
+    <p>
+      In many rural or remote areas, people lack access to medical information or the internet.  
+      <strong>NIHAM HealthWise</strong> bridges this gap by providing a simple, offline, and AI-assisted health guide 
+      that educates users about common diseases, natural remedies, and healthy living practices.
+    </p>
+
+    <h3>⚡ Why You Should Use It</h3>
+    <ul class="about-points">
+      <li><strong>Offline First:</strong> Works completely without an internet connection — ideal for remote or low-connectivity areas.</li>
+      <li><strong>AI Chatbot:</strong> A friendly virtual assistant trained to answer disease-related and wellness questions instantly.</li>
+      <li><strong>Comprehensive Health Database:</strong> Includes information on 100+ diseases with prevention, diet, and medication suggestions.</li>
+      <li><strong>Natural Remedies:</strong> Suggests traditional, safe, and home-based treatments alongside modern guidance.</li>
+      <li><strong>Educational Tool:</strong> Perfect for schools, competitions, and awareness campaigns about healthcare technology.</li>
+      <li><strong>Privacy-Focused:</strong> All data runs locally — no internet tracking or data sharing.</li>
+    </ul>
+
+    <h3>💡 Core Features</h3>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>AI Health Chatbot</h4>
+        <p>Ask any health-related question — from common diseases to prevention tips — and get instant AI-based responses.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Natural & Herbal Remedies</h4>
+        <p>Discover traditional healing methods supported by nutrition, herbs, and lifestyle improvements.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Interactive Statistics</h4>
+        <p>Visualize global and local health trends through colorful, easy-to-understand bar and pie charts.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Innovation for All</h4>
+        <p>Designed for competitions, health expos, and awareness drives — simple yet impactful for every age group.</p>
+      </div>
+    </div>
+
+    <h3>🚀 Our Mission</h3>
+    <p>
+      To create a world where **knowledge saves lives** — where every student, teacher, and citizen can access reliable 
+      healthcare education even offline.  
+      <strong>NIHAM HealthWise</strong> is more than a website — it’s a movement toward a healthier, informed, and connected world.
+    </p>
+
+    <div class="contact-box">
+      <p><strong>Contact us:</strong> <a href="mailto:nihamhealthwise2025@gmail.com">nihamhealthwise2025@gmail.com</a></p>
+    </div>
+  </div>
+</section>
+<style>/* ======== ABOUT SECTION ======== */
+.about-container {
+  max-width: 1000px;
+  margin: 80px auto;
+  padding: 40px;
+  background: rgba(0, 255, 195, 0.05);
+  border: 1px solid rgba(0, 255, 195, 0.2);
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0, 255, 195, 0.15);
+  color: #e0ffff;
+}
+
+.about-container h2 {
+  font-size: 2.4em;
+  color: #00ffc3;
+  text-align: center;
+  text-shadow: 0 0 15px #00ffc3;
+}
+
+.about-intro {
+  font-size: 1.2em;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #d1fdfc;
+}
+
+.highlight {
+  color: #00ffc3;
+  font-weight: 600;
+}
+
+.about-container h3 {
+  color: #00ffc3;
+  margin-top: 30px;
+}
+
+.about-points {
+  list-style: none;
+  padding: 0;
+}
+.about-points li {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,255,195,0.1);
+  color: #b8ffff;
+}
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+.feature-card {
+  background: rgba(0, 255, 195, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid rgba(0, 255, 195, 0.2);
+}
+.feature-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px #00ffc3;
+}
+.contact-box {
+  text-align: center;
+  margin-top: 40px;
+}
+.contact-box a {
+  color: #00ffc3;
+  text-decoration: none;
+}
+.contact-box a:hover {
+  text-decoration: underline;
+}
+</style>
+    <div class="footer">© 2025 NIHAM HealthWise — Blending Nature, Health, and Innovation</div>
+  </main>
+
+<script>
+/* ---------- Data ---------- */
+/* Disease entries and matching natural remedies keyed by id */
+const DATA = [
+  { id:'fever', name:'Fever 🤒', severity:'Low–Medium', diet:'Fluids, fruits, light meals', med:'Paracetamol, rest', time:'2–5 days', curable:'Yes', remedy:'fever', remedyText:'Hydration, tulsi tea, rest, sponge baths for high fever.' },
+  { id:'commoncold', name:'Common Cold🥶', severity:'Low', diet:'Warm fluids, vitamin C', med:'Antihistamines, decongestants', time:'5–10 days', curable:'Yes', remedy:'cold', remedyText:'Honey-lemon, steam inhalation, ginger tea.' },
+  { id:'influenza', name:'Influenza (Flu)😷', severity:'Moderate', diet:'Soups, liquids', med:'Antivirals in selected cases', time:'7–14 days', curable:'Yes', remedy:'flu', remedyText:'Rest, elderberry (supportive), fluids.' },
+  { id:'diabetes', name:'Diabetes (Type 2)🔵', severity:'Moderate', diet:'Low sugar, high fiber, whole grains', med:'Metformin, Insulin', time:'Ongoing', curable:'Manageable', remedy:'diabetes', remedyText:'Low-GI diet, cinnamon, fenugreek (with medical care).' },
+  { id:'hypertension', name:'Hypertension❤️‍🩹', severity:'Moderate', diet:'Low sodium, potassium-rich foods', med:'ACE inhibitors, beta blockers', time:'Ongoing', curable:'Manageable', remedy:'hypertension', remedyText:'Garlic, hibiscus tea, celery seed infusion.' },
+  { id:'asthma', name:'Asthma🫁', severity:'Variable', diet:'Avoid triggers, anti-inflammatory foods', med:'Inhalers, corticosteroids', time:'Chronic', curable:'Manageable', remedy:'asthma', remedyText:'Breathing exercises (Buteyko), turmeric in diet.' },
+  { id:'pneumonia', name:'Pneumonia🤧', severity:'High', diet:'Soups, protein', med:'Antibiotics if bacterial', time:'2–4 weeks', curable:'Yes', remedy:'pneumonia', remedyText:'Chest physiotherapy after acute phase, ginger soups.' },
+  { id:'tb', name:'Tuberculosis (TB)🫁', severity:'High', diet:'High-protein, calorie-dense', med:'RIPE therapy', time:'6–9 months', curable:'Yes', remedy:'tb', remedyText:'Nutrition support (medical therapy essential).' },
+  { id:'covid', name:'COVID-19😷', severity:'Variable', diet:'Fluids, good nutrition', med:'Supportive care', time:'2–3 weeks', curable:'Usually', remedy:'covid', remedyText:'Rest, hydration, graded rehab for long COVID.' },
+  { id:'malaria', name:'Malaria', severity:'High', diet:'Hydration, iron as needed', med:'Artemisinin-based therapy', time:'2–3 weeks', curable:'Yes', remedy:'malaria', remedyText:'Prompt medical treatment; rest and fluids.'},
+  { id:'dengue', name:'Dengue', severity:'High', diet:'Fluids, ORS', med:'Supportive care', time:'1–2 weeks', curable:'Yes', remedy:'dengue', remedyText:'Oral rehydration, papaya leaf juice in some settings.'},
+  { id:'typhoid', name:'Typhoid', severity:'High', diet:'Soft foods, fluids', med:'Antibiotics', time:'2–3 weeks', curable:'Yes', remedy:'typhoid', remedyText:'Hydration, follow prescribed antibiotics.'},
+  { id:'hepatitis', name:'Hepatitis', severity:'Variable', diet:'Low alcohol, low fat', med:'Antivirals if indicated', time:'Weeks-months', curable:'Sometimes', remedy:'hepatitis', remedyText:'Avoid alcohol; antioxidant-rich foods.'},
+  { id:'arthritis', name:'Arthritis', severity:'Moderate', diet:'Omega-3, anti-inflammatory', med:'NSAIDs, physio', time:'Ongoing', curable:'Manageable', remedy:'arthritis', remedyText:'Turmeric with black pepper, omega-3 supplements.'},
+  { id:'anemia', name:'Anemia', severity:'Moderate', diet:'Iron-rich foods + VitC', med:'Iron supplements', time:'1–2 months', curable:'Yes', remedy:'anemia', remedyText:'Iron-rich diet, beetroot, spinach with lemon.'},
+  { id:'migraine', name:'Migraine', severity:'Moderate', diet:'Avoid triggers', med:'Triptans, pain relief', time:'Variable', curable:'Manageable', remedy:'migraine', remedyText:'Magnesium, hydration, identify triggers.'},
+  { id:'obesity', name:'Obesity', severity:'Moderate', diet:'Low-calorie, high-fiber', med:'Lifestyle, meds if needed', time:'Ongoing', curable:'Manageable', remedy:'obesity', remedyText:'Dietary changes, regular exercise, portion control.'},
+  { id:'ulcer', name:'Stomach Ulcer', severity:'Moderate', diet:'Avoid spicy/acidic', med:'PPI, antacids', time:'2–6 weeks', curable:'Yes', remedy:'ulcer', remedyText:'Avoid NSAIDs, small bland meals.'},
+  { id:'epilepsy', name:'Epilepsy', severity:'High', diet:'Special diets sometimes', med:'Anticonvulsants', time:'Variable', curable:'Manageable', remedy:'epilepsy', remedyText:'Medication adherence; specialist diets in some cases.'},
+  { id:'appendicitis', name:'Appendicitis', severity:'High', diet:'NPO if suspected', med:'Surgery', time:'Weeks post-op', curable:'Yes', remedy:'appendicitis', remedyText:'Surgical treatment — seek emergency care.'},
+  { id:'depression', name:'Depression', severity:'High', diet:'Omega-3 & B-vitamins', med:'SSRIs + therapy', time:'Weeks-months', curable:'Treatable', remedy:'depression', remedyText:'Exercise, sunlight, therapy, social support.'},
+  { id:'anxiety', name:'Anxiety', severity:'Moderate', diet:'Avoid caffeine', med:'Therapy/meds', time:'Variable', curable:'Treatable', remedy:'anxiety', remedyText:'Breathing exercises, chamomile, therapy.'},
+  { id:'kidneystone', name:'Kidney Stones', severity:'Moderate', diet:'Hydration, limit salt', med:'Pain meds, lithotripsy', time:'Days-weeks', curable:'Yes', remedy:'kidneystone', remedyText:'Lemon water, hydration, reduce sodium.'},
+  { id:'copd', name:'COPD', severity:'High', diet:'High calorie if needed', med:'Bronchodilators', time:'Chronic', curable:'Manageable', remedy:'copd', remedyText:'Smoking cessation, pulmonary rehab.'},
+  { id:'alzheimer', name:"Alzheimer's Disease", severity:'High', diet:'Mediterranean diet', med:'Symptomatic meds', time:'Chronic', curable:'Manageable', remedy:'alzheimer', remedyText:'Cognitive activities, Mediterranean-style diet.'},
+  { id:'parkinson', name:"Parkinson's Disease", severity:'High', diet:'Protein timing', med:'Levodopa', time:'Chronic', curable:'Manageable', remedy:'parkinson', remedyText:'Exercise, physical therapy, balance training.'},
+  { id:'cancer', name:'Cancer (various)', severity:'High', diet:'Nutrition support', med:'Surgery/chemo/radiation', time:'Variable', curable:'Depends', remedy:'cancer', remedyText:'Nutrition during therapy; supportive care.'},
+  { id:'hiv', name:'HIV/AIDS', severity:'High', diet:'Good nutrition', med:'ART', time:'Chronic', curable:'No (manageable)', remedy:'hiv', remedyText:'ART adherence and healthy diet.'},
+  { id:'rabies', name:'Rabies', severity:'Critical', diet:'N/A', med:'Post-exposure prophylaxis', time:'N/A', curable:'Preventable', remedy:'rabies', remedyText:'Immediate PEP after animal bite — urgent!'},
+  { id:'tetanus', name:'Tetanus', severity:'Critical', diet:'Supportive', med:'Antitoxin/antibiotics', time:'Critical', curable:'Manageable', remedy:'tetanus', remedyText:'Immunization and urgent care.'},
+  { id:'otitis', name:'Otitis Media', severity:'Low', diet:'Comfort foods', med:'Analgesics/antibiotics', time:'Days-weeks', curable:'Yes', remedy:'otitis', remedyText:'Warm compress, analgesics.'},
+  { id:'conjunctivitis', name:'Conjunctivitis', severity:'Low', diet:'Supportive', med:'Lubricants/antibiotics', time:'Days-weeks', curable:'Yes', remedy:'conjunctivitis', remedyText:'Hygiene, warm compress.'},
+  { id:'sinusitis', name:'Sinusitis', severity:'Low', diet:'Hydration', med:'Nasal steroids', time:'1–3 weeks', curable:'Yes', remedy:'sinusitis', remedyText:'Saline rinses, steam inhalation.'},
+  { id:'cholera', name:'Cholera', severity:'High', diet:'ORS', med:'Rehydration/antibiotics', time:'Days', curable:'Yes', remedy:'cholera', remedyText:'Immediate ORS & clean water.'},
+  { id:'measles', name:'Measles', severity:'High', diet:'Supportive', med:'Vitamin A, supportive', time:'Days-weeks', curable:'Yes', remedy:'measles', remedyText:'Vitamin A in children; supportive care.'},
+  { id:'mumps', name:'Mumps', severity:'Medium', diet:'Soft foods', med:'Supportive care', time:'Days-weeks', curable:'Yes', remedy:'mumps', remedyText:'Soft foods, warm compress.'},
+  { id:'gout', name:'Gout', severity:'Medium', diet:'Low-purine diet', med:'NSAIDs, allopurinol', time:'Days-weeks', curable:'Manageable', remedy:'gout', remedyText:'Cherry juice, limit purine-rich foods.'},
+  { id:'eczema', name:'Eczema', severity:'Low', diet:'Avoid triggers', med:'Emollients', time:'Variable', curable:'Manageable', remedy:'eczema', remedyText:'Moisturizers, coconut oil, avoid irritants.'},
+  { id:'psoriasis', name:'Psoriasis', severity:'Medium', diet:'Anti-inflammatory', med:'Topicals, biologics', time:'Variable', curable:'Manageable', remedy:'psoriasis', remedyText:'Stress reduction, moisturizers.'},
+  { id:'sepsis', name:'Sepsis', severity:'Critical', diet:'Supportive', med:'Urgent antibiotics', time:'Critical', curable:'Depends', remedy:'sepsis', remedyText:'Seek emergency care — urgent.'},
+  { id:'kidneyfailure', name:'Chronic Kidney Disease', severity:'High', diet:'Renal diet', med:'Dialysis/transplant', time:'Chronic', curable:'Manageable', remedy:'ckd', remedyText:'Specialist diet and medical care.'}
+,
+  { id:'bronchitis', name:'Bronchitis', severity:'Medium', diet:'Warm fluids, avoid cold drinks', med:'Bronchodilators, rest', time:'1–3 weeks', curable:'Yes', remedy:'bronchitis', remedyText:'Steam inhalation, turmeric milk, ginger tea.' },
+  { id:'tonsillitis', name:'Tonsillitis', severity:'Medium', diet:'Soft foods, warm soups', med:'Antibiotics if bacterial', time:'1–2 weeks', curable:'Yes', remedy:'tonsillitis', remedyText:'Salt-water gargle, honey-lemon tea.' },
+  { id:'sinusinfection', name:'Sinus Infection', severity:'Low', diet:'Hydration', med:'Decongestants, nasal steroids', time:'1–2 weeks', curable:'Yes', remedy:'sinusinfection', remedyText:'Steam inhalation, saline rinse, eucalyptus oil.' },
+  { id:'gastritis', name:'Gastritis', severity:'Medium', diet:'Avoid spicy food, eat small meals', med:'Antacids, PPI', time:'2–4 weeks', curable:'Yes', remedy:'gastritis', remedyText:'Ginger tea, aloe-vera juice, smaller meals.' },
+  { id:'appendicitispost', name:'Post-Appendicitis Recovery', severity:'Medium', diet:'Soft diet post-surgery', med:'Pain control, antibiotics', time:'2–4 weeks', curable:'Yes', remedy:'appendicitispost', remedyText:'Balanced meals, gradual mobility.' },
+  { id:'herpes', name:'Herpes Simplex', severity:'Medium', diet:'Balanced nutrition', med:'Antivirals', time:'Days–weeks', curable:'Manageable', remedy:'herpes', remedyText:'Aloe vera gel, lysine-rich foods.' },
+  { id:'urinaryinfection', name:'Urinary Tract Infection', severity:'Medium', diet:'Hydration, cranberry juice', med:'Antibiotics', time:'3–7 days', curable:'Yes', remedy:'uti', remedyText:'Drink water, cranberry, avoid irritants.' },
+  { id:'piles', name:'Piles (Hemorrhoids)', severity:'Medium', diet:'High-fiber diet', med:'Topicals, Sitz bath', time:'Weeks', curable:'Yes', remedy:'piles', remedyText:'Fiber foods, warm Sitz bath, witch-hazel.' },
+  { id:'constipation', name:'Constipation', severity:'Low', diet:'High fiber, fluids', med:'Mild laxatives', time:'Days', curable:'Yes', remedy:'constipation', remedyText:'Prunes, flaxseed, warm water in morning.' },
+  { id:'diarrhea', name:'Diarrhea', severity:'Low-Medium', diet:'Light meals, ORS', med:'Hydration, zinc', time:'2–4 days', curable:'Yes', remedy:'diarrhea', remedyText:'ORS, banana, rice gruel, probiotics.' },
+  { id:'cholesterol', name:'High Cholesterol', severity:'Medium', diet:'Low-fat diet, omega-3', med:'Statins', time:'Ongoing', curable:'Manageable', remedy:'cholesterol', remedyText:'Garlic, oats, flaxseed, exercise.' },
+  { id:'thyroid', name:'Thyroid Disorder', severity:'Medium', diet:'Balanced iodine intake', med:'Thyroxine or antithyroid drugs', time:'Ongoing', curable:'Manageable', remedy:'thyroid', remedyText:'Adequate iodine, selenium, stress control.' },
+  { id:'vitamind', name:'Vitamin D Deficiency', severity:'Low', diet:'Sunlight, fortified milk', med:'Vitamin D3', time:'Weeks', curable:'Yes', remedy:'vitamind', remedyText:'Sunlight, fish, supplements if advised.' },
+  { id:'vitaminb12', name:'Vitamin B12 Deficiency', severity:'Low', diet:'Eggs, meat, dairy', med:'B12 injections', time:'Weeks', curable:'Yes', remedy:'vitaminb12', remedyText:'B12-rich diet or supplements.' },
+  { id:'dehydration', name:'Dehydration', severity:'Medium', diet:'ORS, fluids', med:'Rehydration therapy', time:'1–2 days', curable:'Yes', remedy:'dehydration', remedyText:'Water, ORS, coconut water.' },
+  { id:'heatstroke', name:'Heat Stroke', severity:'High', diet:'Cool fluids', med:'Emergency cooling', time:'Days', curable:'Yes', remedy:'heatstroke', remedyText:'Shade, hydration, cold compresses.' },
+  { id:'frostbite', name:'Frostbite', severity:'High', diet:'Warm fluids', med:'Rewarming, medical care', time:'Weeks', curable:'Yes', remedy:'frostbite', remedyText:'Gradual rewarming, aloe-vera application.' },
+  { id:'motion', name:'Motion Sickness', severity:'Low', diet:'Light meals', med:'Dimenhydrinate', time:'Hours', curable:'Yes', remedy:'motion', remedyText:'Ginger candy, deep breathing.' },
+  { id:'acne', name:'Acne', severity:'Low-Medium', diet:'Low-sugar diet', med:'Topical retinoids', time:'Weeks', curable:'Manageable', remedy:'acne', remedyText:'Aloe-vera, tea-tree oil, avoid oily foods.' },
+  { id:'hairfall', name:'Hair Fall', severity:'Low', diet:'Protein-rich diet', med:'Minoxidil', time:'Ongoing', curable:'Manageable', remedy:'hairfall', remedyText:'Amla oil, balanced diet, stress control.' },
+  { id:'dandruff', name:'Dandruff', severity:'Low', diet:'Balanced diet', med:'Ketoconazole shampoo', time:'Weeks', curable:'Yes', remedy:'dandruff', remedyText:'Aloe-vera gel, lemon, coconut oil.' },
+  { id:'eyeinfection', name:'Eye Infection', severity:'Low', diet:'Rich in Vitamin A', med:'Antibiotic drops', time:'Days', curable:'Yes', remedy:'eyeinfection', remedyText:'Rose-water rinse, hygiene, avoid rubbing eyes.' },
+  { id:'earinfection', name:'Ear Infection', severity:'Low', diet:'Normal diet', med:'Antibiotics', time:'Days', curable:'Yes', remedy:'earinfection', remedyText:'Warm compress, olive-oil drops (if safe).' },
+  { id:'coldsores', name:'Cold Sores', severity:'Low', diet:'Balanced', med:'Antivirals', time:'Days-weeks', curable:'Manageable', remedy:'coldsores', remedyText:'Aloe-vera, ice application.' },
+  { id:'mouthulcer', name:'Mouth Ulcer', severity:'Low', diet:'Soft food', med:'Topical gel', time:'Days', curable:'Yes', remedy:'mouthulcer', remedyText:'Honey, coconut oil, avoid spicy foods.' },
+  { id:'insomnia', name:'Insomnia', severity:'Medium', diet:'Light dinner, milk', med:'Melatonin if prescribed', time:'Variable', curable:'Treatable', remedy:'insomnia', remedyText:'Chamomile tea, regular sleep schedule.' },
+  { id:'sleepapnea', name:'Sleep Apnea', severity:'High', diet:'Weight control', med:'CPAP therapy', time:'Ongoing', curable:'Manageable', remedy:'sleepapnea', remedyText:'Weight loss, side-sleeping, avoid alcohol.' },
+  { id:'heartattack', name:'Heart Attack Recovery', severity:'Critical', diet:'Low fat, high fiber', med:'Antiplatelets, statins', time:'Weeks-months', curable:'Treatable', remedy:'heartattack', remedyText:'Cardiac rehab, walking, omega-3 diet.' },
+  { id:'stroke', name:'Stroke Recovery', severity:'High', diet:'Soft foods', med:'Antiplatelets', time:'Months', curable:'Partial', remedy:'stroke', remedyText:'Physiotherapy, brain exercises.' },
+  { id:'liverdisease', name:'Liver Disease', severity:'High', diet:'Low fat, no alcohol', med:'Supportive', time:'Variable', curable:'Sometimes', remedy:'liverdisease', remedyText:'Turmeric, balanced diet, avoid alcohol.' },
+  { id:'pancreatitis', name:'Pancreatitis', severity:'High', diet:'Low-fat diet', med:'IV fluids, rest', time:'Weeks', curable:'Sometimes', remedy:'pancreatitis', remedyText:'Avoid alcohol, light meals post-recovery.' },
+  { id:'gallstones', name:'Gallstones', severity:'Medium', diet:'Low-fat meals', med:'Surgery if needed', time:'Weeks', curable:'Yes', remedy:'gallstones', remedyText:'Lemon juice, fiber, olive-oil (preventive).' },
+  { id:'appendixpain', name:'Appendix Pain', severity:'High', diet:'Avoid food till examined', med:'Surgery', time:'Weeks', curable:'Yes', remedy:'appendixpain', remedyText:'Emergency medical attention required.' },
+  { id:'scabies', name:'Scabies', severity:'Medium', diet:'Normal diet', med:'Permethrin cream', time:'Weeks', curable:'Yes', remedy:'scabies', remedyText:'Neem leaves bath, hygiene, wash clothes hot.' },
+  { id:'ringworm', name:'Ringworm', severity:'Medium', diet:'Normal diet', med:'Antifungal cream', time:'Weeks', curable:'Yes', remedy:'ringworm', remedyText:'Aloe-vera, turmeric paste, hygiene.' },
+  { id:'fungalinfection', name:'Fungal Infection', severity:'Medium', diet:'Normal diet', med:'Antifungal meds', time:'Weeks', curable:'Yes', remedy:'fungalinfection', remedyText:'Tea-tree oil, hygiene.' },
+  { id:'foodpoisoning', name:'Food Poisoning', severity:'Medium', diet:'Fluids, soft food', med:'ORS, antibiotics if severe', time:'Days', curable:'Yes', remedy:'foodpoisoning', remedyText:'Hydration, rest, light diet.' },
+  { id:'allergy', name:'Allergy', severity:'Low-Medium', diet:'Avoid trigger foods', med:'Antihistamines', time:'Variable', curable:'Manageable', remedy:'allergy', remedyText:'Honey (local), vitamin C, avoid triggers.' },
+  { id:'asthmaticbronchitis', name:'Asthmatic Bronchitis', severity:'Medium', diet:'Warm fluids', med:'Inhalers', time:'Weeks', curable:'Manageable', remedy:'asthmaticbronchitis', remedyText:'Steam inhalation, turmeric milk.' },
+  { id:'sinusheadache', name:'Sinus Headache', severity:'Low', diet:'Hydration', med:'Pain relief, nasal care', time:'Days', curable:'Yes', remedy:'sinusheadache', remedyText:'Steam, saline rinse, rest.' },
+  { id:'lactose', name:'Lactose Intolerance', severity:'Low', diet:'Avoid dairy', med:'Lactase enzyme', time:'Ongoing', curable:'Manageable', remedy:'lactose', remedyText:'Use lactose-free milk, probiotics.' },
+  { id:'celiac', name:'Celiac Disease', severity:'High', diet:'Gluten-free', med:'Dietary management', time:'Ongoing', curable:'Manageable', remedy:'celiac', remedyText:'Strict gluten-free diet.' },
+  { id:'obstructivesleep', name:'Obstructive Sleep Disorder', severity:'High', diet:'Light dinner', med:'CPAP therapy', time:'Ongoing', curable:'Manageable', remedy:'obstructivesleep', remedyText:'Weight loss, regular sleep.' },
+  { id:'osteoporosis', name:'Osteoporosis', severity:'High', diet:'Calcium, Vitamin D', med:'Bisphosphonates', time:'Chronic', curable:'Manageable', remedy:'osteoporosis', remedyText:'Weight-bearing exercise, calcium foods.' },
+  { id:'menopause', name:'Menopause', severity:'Medium', diet:'Soy, calcium foods', med:'HRT if prescribed', time:'Ongoing', curable:'Natural', remedy:'menopause', remedyText:'Flaxseed, exercise, balanced diet.' },
+  { id:'pms', name:'Premenstrual Syndrome', severity:'Medium', diet:'Leafy greens, complex carbs', med:'Pain relief', time:'Days', curable:'Manageable', remedy:'pms', remedyText:'Yoga, magnesium, reduce caffeine.' },
+  { id:'uricacid', name:'High Uric Acid', severity:'Medium', diet:'Low-purine', med:'Allopurinol', time:'Weeks', curable:'Yes', remedy:'uricacid', remedyText:'Limit red meat, cherry juice, hydrate.' },
+  { id:'varicose', name:'Varicose Veins', severity:'Medium', diet:'Balanced diet', med:'Compression therapy', time:'Ongoing', curable:'Manageable', remedy:'varicose', remedyText:'Leg elevation, compression stockings.' },
+  { id:'hemophilia', name:'Hemophilia', severity:'High', diet:'Iron-rich foods', med:'Factor replacement', time:'Chronic', curable:'Manageable', remedy:'hemophilia', remedyText:'Avoid injury, medical therapy.' },
+  { id:'lymphoma', name:'Lymphoma', severity:'High', diet:'Nutrition support', med:'Chemotherapy', time:'Months', curable:'Sometimes', remedy:'lymphoma', remedyText:'Balanced diet, rest, follow medical plan.' },
+  { id:'eczema2', name:'Atopic Eczema', severity:'Medium', diet:'Avoid allergens', med:'Steroid creams', time:'Variable', curable:'Manageable', remedy:'eczema2', remedyText:'Moisturizers, avoid scented soaps.' },
+  { id:'hives', name:'Hives (Urticaria)', severity:'Low', diet:'Avoid allergens', med:'Antihistamines', time:'Days', curable:'Yes', remedy:'hives', remedyText:'Cool compress, avoid triggers.' },
+  { id:'anaphylaxis', name:'Anaphylaxis', severity:'Critical', diet:'Avoid triggers', med:'Epinephrine', time:'Immediate', curable:'Emergency', remedy:'anaphylaxis', remedyText:'Carry epinephrine auto-injector.' }
+
+];
+/* ---------- End Data ---------- */
+
+/* ---------- Helper: create DOM cards ---------- */
+function createDiseaseCard(d){
+  const div = document.createElement('div');
+  div.className = 'disease-card';
+  div.setAttribute('data-name', d.name.toLowerCase());
+  div.setAttribute('data-id', d.id);
+  div.innerHTML = `
+    <h3>${d.name}</h3>
+    <p><strong>Severity:</strong> ${d.severity}</p>
+    <p><strong>Diet:</strong> ${d.diet}</p>
+    <p><strong>Medication:</strong> ${d.med}</p>
+    <p><strong>Recovery Time:</strong> ${d.time}</p>
+    <p><strong>Curable:</strong> ${d.curable}</p>
+    <div class="small-actions">
+      <button onclick="openRemedy('${d.id}')" class="primary">View Natural Remedies</button>
+      <button onclick="askChat('${d.name}')">Ask Chatbot</button>
+    </div>
+  `;
+  return div;
+}
+function createRemedyCard(d){
+  const div = document.createElement('div');
+  div.className='remedy-card';
+  div.setAttribute('data-remedy', d.id);
+  div.innerHTML = `<h3>${d.name}</h3><p><strong>Natural Remedy:</strong> ${d.remedyText}</p>`;
+  return div;
+}
+
+/* ---------- Initialization on DOMContentLoaded ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+  // nav wiring
+  document.querySelectorAll('.nav button').forEach(btn=>{
+    btn.addEventListener('click', ()=> {
+      document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      setActivePage(btn.dataset.page);
+    });
+  });
+
+  // fill explore and remedies lists
+  const diseaseList = document.getElementById('diseaseList');
+  const remedyList = document.getElementById('remedyList');
+  DATA.forEach(d => {
+    diseaseList.appendChild(createDiseaseCard(d));
+    remedyList.appendChild(createRemedyCard(d));
+  });
+
+  // search buttons
+  document.getElementById('searchBtn').addEventListener('click', searchDisease);
+  document.getElementById('showAllBtn').addEventListener('click', showAllDiseases);
+  document.getElementById('diseaseSearch').addEventListener('keypress', (e)=>{ if(e.key==='Enter') searchDisease(); });
+
+  document.getElementById('remedySearchBtn').addEventListener('click', searchRemedy);
+  document.getElementById('remedyShowAllBtn').addEventListener('click', showAllRemedies);
+  document.getElementById('remedySearch').addEventListener('keypress', (e)=>{ if(e.key==='Enter') searchRemedy(); });
+
+  // chatbot wiring
+  document.getElementById('sendChatBtn').addEventListener('click', handleChatSend);
+  document.getElementById('chatInput').addEventListener('keypress', (e)=>{ if(e.key==='Enter') handleChatSend(); });
+
+  // initial chat greeting
+  appendBot("Hello! I'm NIHAM — your offline health assistant. Ask about a disease, remedy or general health question.");
+});
+
+/* ---------- Page switch ---------- */
+function setActivePage(pageId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el = document.getElementById(pageId);
+  if(!el) return;
+  el.classList.add('active');
+  // focus search input for explore/remedies quick demo
+  if(pageId === 'explore') setTimeout(()=>document.getElementById('diseaseSearch').focus(),120);
+  if(pageId === 'remedies') setTimeout(()=>document.getElementById('remedySearch').focus(),120);
+}
+
+/* ---------- Explore search ---------- */
+function searchDisease(){
+  const q = document.getElementById('diseaseSearch').value.trim().toLowerCase();
+  const cards = document.querySelectorAll('#diseaseList .disease-card');
+  if(!q){
+    cards.forEach(c=>c.style.display='block');
+    return;
+  }
+  let foundAny=false;
+  cards.forEach(c=>{
+    const name = c.getAttribute('data-name');
+    const id = c.getAttribute('data-id');
+    if(name.includes(q) || id.includes(q) || c.textContent.toLowerCase().includes(q)){
+      c.style.display='block'; foundAny=true;
+    } else c.style.display='none';
+  });
+  if(!foundAny) alert('No disease found. Try simpler terms like "fever", "diabetes", "cold".');
+}
+function showAllDiseases(){
+  document.getElementById('diseaseSearch').value='';
+  document.querySelectorAll('#diseaseList .disease-card').forEach(c=>c.style.display='block');
+}
+
+/* ---------- Remedies search ---------- */
+function searchRemedy(){
+  const q = document.getElementById('remedySearch').value.trim().toLowerCase();
+  const cards = document.querySelectorAll('#remedyList .remedy-card');
+  if(!q){ cards.forEach(c=>c.style.display='block'); return; }
+  let found=false;
+  cards.forEach(c=>{
+    const id = c.getAttribute('data-remedy') || '';
+    if(id.includes(q) || c.textContent.toLowerCase().includes(q)){
+      c.style.display='block'; found=true;
+    } else c.style.display='none';
+  });
+  if(!found) alert('No remedies found. Try another term.');
+}
+function showAllRemedies(){ document.getElementById('remedySearch').value=''; document.querySelectorAll('#remedyList .remedy-card').forEach(c=>c.style.display='block'); }
+
+/* ---------- Link: openRemedy (from a disease card) ---------- */
+function openRemedy(remedyId){
+  // show remedies page
+  setActivePage('remedies');
+  // scroll & highlight
+  setTimeout(()=>{
+    const card = document.querySelector(`#remedyList .remedy-card[data-remedy="${remedyId}"]`);
+    if(card){
+      card.scrollIntoView({behavior:'smooth', block:'center'});
+      const prev = card.style.boxShadow;
+      card.style.boxShadow = '0 0 18px 4px rgba(0,255,170,0.18)';
+      setTimeout(()=> card.style.boxShadow = prev, 2200);
+    } else {
+      alert('No specific remedy listed for this condition in the Remedies page.');
+    }
+  }, 180);
+}
+
+/* ---------- Chat: simple offline rule-based ---------- */
+const chatArea = ()=>document.getElementById('chatArea');
+function appendUser(text){ const d=document.createElement('div'); d.className='msg user'; d.textContent = 'You: '+text; chatArea().appendChild(d); chatArea().scrollTop = chatArea().scrollHeight; }
+function appendBot(text){ const d=document.createElement('div'); d.className='msg bot'; d.textContent = 'NIHAM-Bot: '+text; chatArea().appendChild(d); chatArea().scrollTop = chatArea().scrollHeight; }
+function askChat(q){ setActivePage('chatbot'); setTimeout(()=>{ appendUser(q); const r=botRespond(q); appendBot(r); botSpeak(r); }, 220); }
+function handleChatSend(){ const inp=document.getElementById('chatInput'); const q=inp.value.trim(); if(!q) return; appendUser(q); inp.value=''; setTimeout(()=>{ const r=botRespond(q); appendBot(r); botSpeak(r); }, 350); }
+
+/* Improved botRespond to match disease ids and keywords */
+function botRespond(text){
+  if(!text) return "Please type a question.";
+  const t = text.toLowerCase();
+
+  // emergency quick refusal
+  if(/\b(emergency|not breathing|chest pain|suicide|kill myself|severe bleeding|unconscious)\b/.test(t)){
+    return "I can't provide emergency assistance. If someone is in immediate danger, call local emergency services now.";
+  }
+
+  // direct disease match by id or name substring
+  for(const d of DATA){
+    if(t.includes(d.id) || t.includes(d.name.toLowerCase()) || d.name.toLowerCase().includes(t)){
+      return `${d.name}: Severity ${d.severity}. Diet: ${d.diet}. Medication: ${d.med}. Recovery: ${d.time}. Curable: ${d.curable}.`;
+    }
+  }
+
+  // remedy match
+  for(const d of DATA){
+    if(t.includes('remedy '+d.name.toLowerCase()) || t.includes('natural '+d.name.toLowerCase()) || t.includes('remedy '+d.id) || t.includes(d.id+' remedy')){
+      return `${d.name} natural remedies: ${d.remedyText}`;
+    }
+  }
+
+  // keyword shortcuts
+  if(/\b(fever|temperature)\b/.test(t)) return "Fever: stay hydrated, rest, use paracetamol if necessary. See a doctor if >3 days or very high.";
+  if(/\b(cold|cough|flu)\b/.test(t)) return "Cough/cold: warm fluids, steam inhalation, rest. Seek care if shortness of breath.";
+  if(/\b(diet|nutrition|what to eat)\b/.test(t)) return "General diet: vegetables, whole grains, lean protein, healthy fats. Ask for a condition for tailored tips.";
+  if(/\b(remedy|natural|home)\b/.test(t)) return "Ask 'Natural remedies for <disease>' (e.g., 'Natural remedies for fever').";
+  if(/\b(hello|hi|hey)\b/.test(t)) return "Hello! I'm NIHAM — ask about a disease, remedy, or general health question.";
+  if(/\b(joke|funny)\b/.test(t)) return "Why did the doctor carry a red pen? In case they needed to draw blood! 😄";
+
+  // general knowledge small set
+  const general = {
+    'ai':'AI is the simulation of human intelligence by machines — useful in diagnostics and research.',
+    'india':'India is a country in South Asia known for its diversity and innovation.',
+    'water':'Water is essential — drink regularly to maintain hydration (about 2-3 L/day depending on needs).'
+  };
+  for(const k in general) if(t.includes(k)) return general[k];
+
+  // navigation
+  if(/\b(home|go back|main)\b/.test(t)){ setActivePage('home'); return "Taking you back to Home."; }
+
+  return "I'm not sure about that yet. Try asking about a disease (e.g., 'diabetes'), a remedy ('natural remedies for fever'), or general health.";
+}
+
+/* ---------- Text-to-speech (optional) ---------- */
+let voiceEnabled = true;
+function botSpeak(text){
+  if(!voiceEnabled) return;
+  try{
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 1; u.pitch = 1;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+// Animate Statistics Section
+function animateCharts() {
+  // Animate bars
+  document.querySelectorAll('.bar-fill').forEach(bar => {
+    bar.style.width = bar.getAttribute('data-width') + '%';
+  });
+
+  // Animate counters
+  const counters = document.querySelectorAll('.count');
+  counters.forEach(counter => {
+    const target = +counter.getAttribute('data-count');
+    let count = 0;
+    const speed = 20;
+    const update = () => {
+      if (count < target) {
+        count++;
+        counter.textContent = count;
+        setTimeout(update, speed);
+      }
+    };
+    update();
+  });
+}
+
+// Trigger when navigating to Statistics page
+document.querySelectorAll('nav button[data-page="statistics"]').forEach(btn => {
+  btn.addEventListener('click', animateCharts);
+});
+// === Simple Welcome Voice on Load ===
+window.addEventListener("load", () => {
+  const msg = new SpeechSynthesisUtterance("Hello, welcome to NIHAM. Blending Nature, Health and Innovation");
+  msg.lang = "en-US";
+  msg.pitch = 1;
+  msg.rate = 1;
+  msg.volume = 1;
+  window.speechSynthesis.speak(msg);
+});
+// ======== INTRO LOGIC ========
+window.addEventListener("load", () => {
+  const intro = document.getElementById("intro");
+  const home = document.getElementById("home");
+
+  // Play welcome voice
+  const msg = new SpeechSynthesisUtterance("Hello, welcome to NIHAM.");
+  msg.lang = "en-US";
+  msg.rate = 1;
+  msg.pitch = 1.1;
+  msg.volume = 1;
+  window.speechSynthesis.speak(msg);
+
+  // After 4 seconds, hide intro and show home
+  setTimeout(() => {
+    intro.style.display = "none";
+    home.classList.add("active");
+  }, 4000);
+});
+
+
+/* End of script */
+</script>
+</body>
+</html>
